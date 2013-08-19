@@ -1,0 +1,34 @@
+About msicon-extractor
+========================
+
+msicon-extractor is able to extract icons from microsoft .ICO files and
+PE files (.exe and .dll) and ouputs them in a freedesktop.org compliant
+directory structure (so it can be directly used in an icon theme)
+
+Highlights:
+    * Support for both PE32 and PE32+ (64 bit exe)
+    * Works on big and little endian systems
+    * Small test suite to verify basic functionality
+
+Dependencies:
+    * CMake
+    * C99 compiler and standard library (tested with gcc)
+    * glib 2.x (tested with >=2.32)
+    * libpng (libpng1.2)
+
+It should run on any Unix-like operating system and maybe even on Windows,
+but it was only tested on linux.
+
+Building:
+    * download source code, create a separate build directory and run cmake
+        mkdir build && cd build && cmake ..
+    * run make
+    * run test suite: ./extractor-test
+
+Installing:
+    * there is no install target yet, but you can just copy the binary
+
+License:
+    * Code: GPLv3 (see LICENSE)
+    * The test suite operates on some firefox binaries I happened to have lying
+      around. There may be trademark issues involved.
