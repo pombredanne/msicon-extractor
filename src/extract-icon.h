@@ -13,7 +13,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
+/** @file
  * Functions for extracting icons from an IconDir
  */
 
@@ -24,7 +24,7 @@
 
 /**
  * walks through an IconDir structure and returns a hash table mapping a string
- * like "WIDTHxHEIGHT" to a matching @link IconInfo. If there are multiple icons
+ * like "WIDTHxHEIGHT" to a matching IconInfo. If there are multiple icons
  * with the same size, only the one with the highest bpp is returned.
  *
  * @returns a newly allocated GHashTable of newly allocated strings and newly allocated IconInfos

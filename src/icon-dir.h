@@ -19,7 +19,7 @@
 #include <glib.h>
 #include <string.h>
 
-/**
+/** @file
  * Routines and macros for dealing with the icon structures.
  */
 

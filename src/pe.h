@@ -19,7 +19,7 @@
 #include <string.h>
 #include "file.h"
 
-/**
+/** @file
  * functions and macros for dealing with PE files
  */
 

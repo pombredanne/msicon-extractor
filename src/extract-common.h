@@ -17,8 +17,8 @@
 
 #include <glib.h>
 
-/**
- * extraction functions common for both pe and ico files
+/** @file
+ * extraction functions common for both PE and ICO files
  */
 
 

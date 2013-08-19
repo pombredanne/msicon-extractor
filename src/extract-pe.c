@@ -96,8 +96,8 @@ static char *get_data_of_first_resource(GMappedFile *file, char *resource_sectio
 }
 
 /**
- * find a resource in the pe file @param pe_file described by the resource type @param type
- * and return the @param no th one. Will return NULL if the resource could not be found.
+ * find a resource in the pe file @a pe_file described by the resource type @a type
+ * and return the @a no th one. Will return NULL if the resource could not be found.
  *
  * FIXME: doesn't allow type strings
  */
@@ -126,13 +126,13 @@ static char *find_resource_by_type(GMappedFile *pe_file, gint32 type, int no)
 }
 
 /**
- * find a resource in the pe file @param pe_file described by the resource type @param type
- * and return the one with the id @param id. Will return NULL if the resource could not be found.
+ * find a resource in the pe file @a pe_file described by the resource type @a type
+ * and return the one with the id @a id. Will return NULL if the resource could not be found.
  *
  * FIXME: doesn't allow type or name strings
  * FIXME: code duplication with above function
  */
-char *find_resource_by_type_and_id(GMappedFile *pe_file, guint32 type, guint32 id)
+static char *find_resource_by_type_and_id(GMappedFile *pe_file, guint32 type, guint32 id)
 {
     char *resource_section = get_pe_resource_directory(pe_file);
 

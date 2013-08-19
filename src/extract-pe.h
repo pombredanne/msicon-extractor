@@ -18,7 +18,7 @@
 #include <glib.h>
 
 /**
- * Return a pointer to a the GrpIconDir with numer i
+ * Return a pointer to a the GrpIconDir with number @a i
  */
 char *get_grp_icon_dir_from_pe(GMappedFile *pe_file, int i);
 
