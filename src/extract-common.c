@@ -68,6 +68,7 @@ gboolean peek_width_height(GMappedFile *file, char* data_ptr, gint* width, gint*
         // This is obviously lazy but I've yet to see an icon file that isn't
         // compatible with this approach
         *bpp = 32;
+        return TRUE;
     } else {
         // assumed to be a bitmap header
         *width = bitmap_info_header_width(data_ptr);
@@ -80,7 +81,7 @@ gboolean peek_width_height(GMappedFile *file, char* data_ptr, gint* width, gint*
 void read_png_from_mem_buf(png_structp png_ptr, png_bytep out_bytes, png_size_t byte_count_to_read)
 {
     memcpy(out_bytes, png_ptr->io_ptr, byte_count_to_read);
-    png_ptr->io_ptr += byte_count_to_read;
+    png_ptr->io_ptr = (char *)png_ptr->io_ptr + byte_count_to_read;
 }
 
 

@@ -27,13 +27,13 @@ gchar* offset_to_ptr(GMappedFile* file, guint32 rva, guint32 size)
 
 guint32 ptr_to_offset(GMappedFile* file, gpointer data)
 {
-    return data - (gpointer)g_mapped_file_get_contents(file);
+    return (char *)data - g_mapped_file_get_contents(file);
 }
 
 gboolean is_ptr_valid(GMappedFile* file, gpointer data, guint32 size)
 {
-    return data >= (gpointer)g_mapped_file_get_contents(file) &&
-        (data + size) <= ((gpointer)g_mapped_file_get_contents(file) + g_mapped_file_get_length(file));
+    return (char *)data >= g_mapped_file_get_contents(file) &&
+        ((char *)data + size) <= (g_mapped_file_get_contents(file) + g_mapped_file_get_length(file));
 }
 
 

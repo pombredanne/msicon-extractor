@@ -51,7 +51,7 @@ static void check_extractor_for_file(const char *file)
         // first launch the extractor
         int status;
         gchar *command_line = g_strdup_printf("\"%s\" -d \"%s\" --max-bpp=%d \"%s\"", EXTRACTOR_BINARY,
-                                              EXTRACTOR_TEST_TMP, bpps_to_test[i], src_file, NULL);
+                                              EXTRACTOR_TEST_TMP, bpps_to_test[i], src_file);
         g_assert(g_spawn_command_line_sync(command_line, NULL, NULL, &status, NULL));
         g_assert(status == 0);
 
@@ -64,7 +64,7 @@ static void check_extractor_for_file(const char *file)
         g_assert(compare_dir); // well this would be bad if it failed
 
         const gchar *size;
-        while (size = g_dir_read_name(compare_dir)) {
+        while ((size = g_dir_read_name(compare_dir))) {
             gchar *newly_extracted_file = g_build_filename(EXTRACTOR_TEST_TMP, size, "apps", file_png, NULL);
             gchar *master_file = g_build_filename(compare_directory, size, NULL);
 

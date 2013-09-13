@@ -59,12 +59,12 @@ gboolean write_icon_table_to_disk(const gchar *base_dir, const gchar *appname, G
             IconInfo *info = (IconInfo*)g_hash_table_lookup(table, keys->data);
             g_return_val_if_fail(info != NULL, FALSE);
             char *icon_data = info->image_data;
-            if (png_sig_cmp(icon_data, 0, 8) == 0) {
-                g_debug("png file, passing through: %s", keys->data);
+            if (png_sig_cmp((png_bytep)icon_data, 0, 8) == 0) {
+                g_debug("png file, passing through: %s", (char*)keys->data);
                 // png files will be just passed through
                 size_t bytes_written = fwrite(icon_data, 1, info->image_size, fp);
                 if (bytes_written != info->image_size) {
-                    g_printerr(_("ERROR: Only %d of %d bytes could be written to `%s': %s\n"),
+                    g_printerr(_("ERROR: Only %zu of %zu bytes could be written to `%s': %s\n"),
                                bytes_written, info->image_size, filename_full, g_strerror(errno));
                     retval = FALSE;
                 }
@@ -83,7 +83,7 @@ gboolean write_icon_table_to_disk(const gchar *base_dir, const gchar *appname, G
             g_free(filename);
             g_free(filename_full);
         }
-    } while (keys = g_list_next(keys));
+    } while ((keys = g_list_next(keys)));
 
     return retval;
 }
@@ -91,7 +91,7 @@ gboolean write_icon_table_to_disk(const gchar *base_dir, const gchar *appname, G
 void read_png_from_mem_buf(png_structp png_ptr, png_bytep out_bytes, png_size_t byte_count_to_read)
 {
     memcpy(out_bytes, png_ptr->io_ptr, byte_count_to_read);
-    png_ptr->io_ptr += byte_count_to_read;
+    png_ptr->io_ptr = (char *)png_ptr->io_ptr + byte_count_to_read;
 }
 
 

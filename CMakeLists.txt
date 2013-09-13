@@ -14,7 +14,8 @@ pkg_check_modules(GLib glib-2.0 REQUIRED)
 find_package(PNG REQUIRED)
 
 # we want c99
-set(CMAKE_C_FLAGS "--std=c99")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c99")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -pedantic")
 
 # sources
 set(SOURCES_C

@@ -21,7 +21,7 @@
 /**
  * function to return the pixel value in an indexed pixel format with a bpp <= 8
  */
-static guint8 get_pixel_from_row(char *row, int bpp, int x) {
+static guint8 get_pixel_from_row(guint8 *row, int bpp, int x) {
     g_return_val_if_fail(bpp <= 8, 0);
 
     return (row[x * bpp / 8] >> (8 - bpp - (x % (8 / bpp)) * bpp)) & ((1 << bpp) - 1);
@@ -31,7 +31,7 @@ static guint8 get_pixel_from_row(char *row, int bpp, int x) {
  * returns true if the pixel specified by x in the given row of the and map
  * is opaque
  */
-static gboolean pixel_opaque(char *and_row, int x)
+static gboolean pixel_opaque(guint8 *and_row, int x)
 {
     return get_pixel_from_row(and_row, 1, x) == 0;
 }
@@ -66,9 +66,9 @@ gboolean icon_bitmap_to_png(char* bitmap_data_ptr, FILE* fp)
     int and_row_width = width / 8.0f; // make sure we round up to full bytes
     and_row_width = next_multiple(4, and_row_width);
 
-    char *color_tbl = G_STRUCT_MEMBER_P(bitmap_data_ptr, bitmap_info_header_get_size(bitmap_data_ptr));
-    char *xor_map = G_STRUCT_MEMBER_P(color_tbl, colors * 4);
-    char *and_map = G_STRUCT_MEMBER_P(xor_map, height * xor_row_width);
+    guint8 *color_tbl = G_STRUCT_MEMBER_P(bitmap_data_ptr, bitmap_info_header_get_size(bitmap_data_ptr));
+    guint8 *xor_map = G_STRUCT_MEMBER_P(color_tbl, colors * 4);
+    guint8 *and_map = G_STRUCT_MEMBER_P(xor_map, height * xor_row_width);
 
     //debug
     g_debug("writing bitmap at %p: %dx%dx%d with %d colors", bitmap_data_ptr, width, height, bpp, colors);
@@ -102,12 +102,12 @@ gboolean icon_bitmap_to_png(char* bitmap_data_ptr, FILE* fp)
     png_write_info(png_ptr, png_info);
 
     // allocate single row buffer
-    guint8 *row = g_malloc0(sizeof(guint8) * 4 * width);
+    guint8 *row = g_new0(guint8, 4 * width);
 
     // write image row by row
     for (int y = 1; y <= height; ++y) {
-        char *xor_row = &xor_map[(height - y) * xor_row_width];
-        char *and_row = &and_map[(height - y) * and_row_width];
+        guint8 *xor_row = &xor_map[(height - y) * xor_row_width];
+        guint8 *and_row = &and_map[(height - y) * and_row_width];
 
         // fill row buffer based on bpp
         switch (bpp) {
@@ -115,8 +115,8 @@ gboolean icon_bitmap_to_png(char* bitmap_data_ptr, FILE* fp)
                 // stored as 3 byte triplet in bgr format
                 for (int x = 0; x < width; ++x) {
                     // find pixel in bitmap file
-                    char *xor_pixel = &xor_row[x * 3];
-                    char *buffer_pixel = &row[x * 4];
+                    guint8 *xor_pixel = &xor_row[x * 3];
+                    guint8 *buffer_pixel = &row[x * 4];
                     buffer_pixel[0] = xor_pixel[2]; //r
                     buffer_pixel[1] = xor_pixel[1]; //g
                     buffer_pixel[2] = xor_pixel[0]; //b
@@ -126,8 +126,8 @@ gboolean icon_bitmap_to_png(char* bitmap_data_ptr, FILE* fp)
             case 32:
                 // stored as 4 byte bgra quad
                 for (int x = 0; x < width; ++x) {
-                    char *xor_pixel = &xor_row[x * 4];
-                    char *buffer_pixel = &row[x * 4];
+                    guint8 *xor_pixel = &xor_row[x * 4];
+                    guint8 *buffer_pixel = &row[x * 4];
                     buffer_pixel[0] = xor_pixel[2]; //r
                     buffer_pixel[1] = xor_pixel[1]; //g
                     buffer_pixel[2] = xor_pixel[0]; //b
@@ -140,7 +140,7 @@ gboolean icon_bitmap_to_png(char* bitmap_data_ptr, FILE* fp)
                 // most significant bit is not used
                 for (int x = 0; x < width; ++x) {
                     guint16 xor_pixel = GUINT16_FROM_LE(G_STRUCT_MEMBER(guint16, xor_row, x * 2));
-                    char *buffer_pixel = &row[x * 4];
+                    guint8 *buffer_pixel = &row[x * 4];
 
                     //FIXME: I haven't found any 16bpp icons to test the conversion
                     int r = (xor_pixel >> 10) & 31;
@@ -159,8 +159,8 @@ gboolean icon_bitmap_to_png(char* bitmap_data_ptr, FILE* fp)
                 // stored in one byte per pixel, indexed colors
                 for (int x = 0; x < width; ++x) {
                     guint8 xor_pixel = get_pixel_from_row(xor_row, bpp, x);
-                    char *buffer_pixel = &row[x * 4];
-                    char *color = &color_tbl[xor_pixel * 4];
+                    guint8 *buffer_pixel = &row[x * 4];
+                    guint8 *color = &color_tbl[xor_pixel * 4];
 
                     // copy color values
                     buffer_pixel[0] = color[2];

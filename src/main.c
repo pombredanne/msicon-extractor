@@ -80,8 +80,6 @@ int main(int argc, char **argv)
             return 1;
         }
 
-        GHashTable *table;
-
         // check magic of icon directory
         if (is_icon_file(file)) {
             // we have an icon file -> extract icons
@@ -94,9 +92,9 @@ int main(int argc, char **argv)
                 if (keys) {
                     do {
                         if (keys->data) {
-                            g_printf("%s\n", keys->data);
+                            g_printf("%s\n", (char *)keys->data);
                         }
-                    } while (keys = g_list_next(keys));
+                    } while ((keys = g_list_next(keys)));
                     g_list_free(g_list_first(keys));
                 }
             } else {
@@ -111,7 +109,7 @@ int main(int argc, char **argv)
             char *grp_icon_dir;
             if (list_icons) {
                 // enumerate all possible icons
-                for (int i = 0; grp_icon_dir = get_grp_icon_dir_from_pe(file, i); ++i) {
+                for (int i = 0; (grp_icon_dir = get_grp_icon_dir_from_pe(file, i)); ++i) {
                     g_printf("%d: ", i);
 
                     GHashTable *table = parse_group_icon_dir(file, grp_icon_dir, max_bpp);
@@ -119,9 +117,9 @@ int main(int argc, char **argv)
                     if (keys) {
                         do {
                             if (keys->data) {
-                                g_printf("%s ", keys->data);
+                                g_printf("%s ", (char *)keys->data);
                             }
-                        } while (keys = g_list_next(keys));
+                        } while ((keys = g_list_next(keys)));
                         g_list_free(g_list_first(keys));
                     }
                     g_printf("\n");
