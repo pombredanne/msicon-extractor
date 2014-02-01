@@ -1,3 +1,25 @@
-build
 doc
 *.kdev4
+
+# backups and generated stuff
+Makefile.in
+Makefile
+.libs
+.deps
+*.o
+*.log
+*~
+*.tar.gz
+
+# autofoo stuff here
+INSTALL
+compile
+config.*
+configure
+depcomp
+aclocal.m4
+autom4te.cache
+stamp-*
+missing
+install-sh
+test-driver

@@ -13,6 +13,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "write-icons.h"
+#include "config.h"
+
 #include "iconbmp2png.h"
 
 #include <png.h>

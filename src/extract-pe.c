@@ -13,6 +13,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "extract-pe.h"
+#include "config.h"
+
 #include "pe.h"
 #include "write-icons.h"
 #include "extract-common.h"

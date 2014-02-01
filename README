@@ -11,7 +11,7 @@ Highlights:
     * Small test suite to verify basic functionality
 
 Dependencies:
-    * CMake
+    * autotools (for git build)
     * C99 compiler and standard library (tested with gcc)
     * glib 2.x (tested with >=2.32)
     * libpng (libpng1.2)
@@ -20,13 +20,13 @@ It should run on any Unix-like operating system and maybe even on Windows,
 but it was only tested on linux.
 
 Building:
-    * download source code, create a separate build directory and run cmake
-        mkdir build && cd build && cmake ..
+    * download source code and run `./configure` or `autogen.sh`
+        ./autogen.sh
     * run make
-    * run test suite: ./extractor-test
+    * run test suite: `make check`
 
 Installing:
-    * there is no install target yet, but you can just copy the binary
+    * `make install` should work fine
 
 License:
     * Code: GPLv3 (see LICENSE)
