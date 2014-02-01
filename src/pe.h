@@ -81,7 +81,7 @@ static inline char *get_pe_section_table(GMappedFile *file, int *number_of_secti
  */
 static inline char *get_pe_section_header(GMappedFile *file, char *section_name)
 {
-    int num_sections;
+    int num_sections = -1;
     char *section_table = get_pe_section_table(file, &num_sections);
     char *entry = NULL;
     for (int i = 0; i < num_sections; ++i) {
