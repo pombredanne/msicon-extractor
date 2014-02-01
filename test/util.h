@@ -16,6 +16,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 #include <stdio.h>
+#include <glib.h>
 
 /**
  * pixel wise compare two png files. The png files need to have the same bpp and size.
@@ -27,5 +28,11 @@ int pixel_compare_png(FILE *file0, FILE *file1);
  */
 int pixel_compare_png_file(const char *filename0, const char *filename1);
 
+/**
+ * recursively delete a directory
+ *
+ * @returns the number of files deleted, or -1 in case of error
+ */ 
+int recursively_delete_dir(const char *dirname, GError **error);
 
 #endif // UTIL_H

@@ -17,5 +17,5 @@ EXTRA_DIST += \
 extractor_test_CFLAGS = \
     $(glib_CFLAGS) $(libpng_CFLAGS) \
     -std=c99 -Wall -pedantic \
-    -DEXTRACTOR_TEST_DATA='"$(srcdir)/data"' -DEXTRACTOR_BINARY='"$(top_builddir)/src/msicon-extractor"' -DEXTRACTOR_TEST_TMP='"/tmp"'
+    -DEXTRACTOR_BINARY='"$(top_builddir)/src/msicon-extractor"'
 extractor_test_LDFLAGS = $(glib_LIBS) $(libpng_LIBS)

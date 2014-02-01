@@ -17,9 +17,7 @@
 
 #include <glib.h>
 
-#ifndef EXTRACTOR_TEST_DATA
-#   error "define EXTRACTOR_TEST_DATA as string pointing to the path of the test data"
-#endif
+#define DATA(x) g_test_get_filename(G_TEST_DIST, "data", x, NULL)
 
 /**
  * simple function that does some self checks for the png compare code
@@ -27,13 +25,13 @@
 static void png_compare_selfcheck(void)
 {
     // yeah, really basic
-    g_assert(0 == pixel_compare_png_file(EXTRACTOR_TEST_DATA "/one.png", EXTRACTOR_TEST_DATA "/one.png"));
+    g_assert(0 == pixel_compare_png_file(DATA("one.png"), DATA("/one.png")));
 
     // better, compare with the carefully optimized png file
-    g_assert(0 == pixel_compare_png_file(EXTRACTOR_TEST_DATA "/one.png", EXTRACTOR_TEST_DATA "/one.opti.png"));
+    g_assert(0 == pixel_compare_png_file(DATA("one.png"), DATA("one.opti.png")));
 
     // compare with different picture
-    g_assert(0 != pixel_compare_png_file(EXTRACTOR_TEST_DATA "/one.png", EXTRACTOR_TEST_DATA "/another.png"));
+    g_assert(0 != pixel_compare_png_file(DATA("/one.png"), DATA("/another.png")));
 }
 
 /**
@@ -41,17 +39,21 @@ static void png_compare_selfcheck(void)
  */
 static void check_extractor_for_file(const char *file)
 {
-    gchar *src_file = g_build_filename(EXTRACTOR_TEST_DATA, file, NULL);
+    gchar *src_file = g_test_build_filename(G_TEST_DIST, "data", file, NULL);
     gchar *file_png = g_strdup_printf("%s.png", file);
 
     //FIXME: should this really be fixed?
     gint bpps_to_test[] = { 1, 4, 8, 16, 24, 32 }; // and the special INT_MAX directory
+    
+    // create a directory to extract the stuff into
+    gchar *tmp_dir = g_dir_make_tmp(NULL, NULL);
+    g_assert(tmp_dir);
 
     for (int i = 0; i < G_N_ELEMENTS(bpps_to_test); ++i) {
         // first launch the extractor
         int status;
         gchar *command_line = g_strdup_printf("\"%s\" -d \"%s\" --max-bpp=%d \"%s\"", EXTRACTOR_BINARY,
-                                              EXTRACTOR_TEST_TMP, bpps_to_test[i], src_file);
+                                              tmp_dir, bpps_to_test[i], src_file);
         g_assert(g_spawn_command_line_sync(command_line, NULL, NULL, &status, NULL));
         g_assert(status == 0);
 
@@ -59,13 +61,13 @@ static void check_extractor_for_file(const char *file)
 
         // now check whether all the right files are there and equal
         gchar *bpp_str = g_strdup_printf("%d", bpps_to_test[i]);
-        gchar *compare_directory = g_build_filename(EXTRACTOR_TEST_DATA, "extracted-data-to-compare", file, bpp_str, NULL);
+        gchar *compare_directory = g_test_build_filename(G_TEST_DIST, "data", "extracted-data-to-compare", file, bpp_str, NULL);
         GDir *compare_dir = g_dir_open(compare_directory, 0, NULL);
         g_assert(compare_dir); // well this would be bad if it failed
 
         const gchar *size;
         while ((size = g_dir_read_name(compare_dir))) {
-            gchar *newly_extracted_file = g_build_filename(EXTRACTOR_TEST_TMP, size, "apps", file_png, NULL);
+            gchar *newly_extracted_file = g_build_filename(tmp_dir, size, "apps", file_png, NULL);
             gchar *master_file = g_build_filename(compare_directory, size, NULL);
 
             // magic happens here - we test the individual files on pixel equality
@@ -79,7 +81,12 @@ static void check_extractor_for_file(const char *file)
         g_free(compare_directory);
         g_free(bpp_str);
     }
+    
+    GError *err = NULL;
+    recursively_delete_dir(tmp_dir, &err);
+    g_assert_no_error(err);
 
+    
     g_free(file_png);
     g_free(src_file);
 }
@@ -89,9 +96,7 @@ int main(int argc, char **argv)
 {
     g_test_init(&argc, &argv, NULL);
 
-    g_debug("Directory with test data: %s", EXTRACTOR_TEST_DATA);
     g_debug("Extractor executable to test: %s", EXTRACTOR_BINARY);
-    g_debug("Directory to place temporary extraction results: %s", EXTRACTOR_TEST_TMP);
 
     g_test_add_func("/msicon-extractor/pngcompare-selfcheck", png_compare_selfcheck);
     g_test_add_data_func("/msicon-extractor/extract-pe", "firefox.exe", (GTestDataFunc)check_extractor_for_file);

@@ -18,6 +18,7 @@
 #include <png.h>
 #include <glib.h>
 #include <glib/gstdio.h>
+#include <errno.h>
 
 int pixel_compare_png(FILE* file0, FILE* file1)
 {
@@ -103,4 +104,58 @@ int pixel_compare_png_file(const char* filename0, const char* filename1)
     return retval;
 }
 
+int recursively_delete_dir(const char *dirname, GError **error)
+{
+    int num_files = 0;
+    GDir *dir = g_dir_open(dirname, 0, error);
+    if (dir) {
+        const gchar *name;
+        while ((name = g_dir_read_name(dir))) {
+            gchar *full_name = g_strdup_printf("%s/%s", dirname, name);
+            
+            if (g_file_test(full_name, G_FILE_TEST_IS_DIR)) {
+                GError *sub_error = NULL;
+                int subdir_num_files = recursively_delete_dir(full_name, &sub_error);
+                if (subdir_num_files > -1) {
+                    num_files += subdir_num_files;
+                } else {
+                    g_propagate_error(error, sub_error);
+                    num_files = -1;
+                    goto cleanup;
+                }
+            } else {
+                if (g_unlink(full_name) < 0) {
+                    if (error != NULL) {
+                        int _errno = errno;
+                        *error = g_error_new(G_FILE_ERROR, g_file_error_from_errno(_errno), "%s: %s", g_strerror(_errno), full_name);
+                    }
+                    num_files = -1;
+                } else {
+                    num_files += 1;
+                }
+            }
+            
+            g_free(full_name);
+            if (num_files == -1) {
+                goto cleanup;
+            }
+        }
+        
+        if (g_rmdir(dirname) < 0) {
+            if (error != NULL) {
+                int _errno = errno;
+                *error = g_error_new(G_FILE_ERROR, g_file_error_from_errno(_errno), "%s: %s", g_strerror(_errno), dirname);
+            }
+            num_files = -1;
+        } else {
+            num_files += 1;
+        }
+        
+    cleanup:
+        g_dir_close(dir);
+        return num_files;
+    } else {
+        return -1;
+    }
+}
 
